@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { routeLocalDistAssets } from './static-assets';
 
 async function mockOptionsRuntime(page: Page, hiddenKeys: string[]): Promise<void> {
   await page.addInitScript(({ initialHiddenKeys }) => {
@@ -150,6 +151,7 @@ async function mockOptionsRuntime(page: Page, hiddenKeys: string[]): Promise<voi
 }
 
 test('options page removes an item through row action', async ({ page }) => {
+  await routeLocalDistAssets(page);
   await mockOptionsRuntime(page, ['S000123456789']);
   await page.goto('/options.html');
 
@@ -164,6 +166,7 @@ test('options page removes an item through row action', async ({ page }) => {
 });
 
 test('clear-all cancellation keeps current list intact', async ({ page }) => {
+  await routeLocalDistAssets(page);
   await mockOptionsRuntime(page, ['A-11111', 'B-22222']);
   await page.addInitScript(() => {
     window.confirm = () => false;
@@ -177,6 +180,7 @@ test('clear-all cancellation keeps current list intact', async ({ page }) => {
 });
 
 test('clear-all confirmation accepted clears all rows', async ({ page }) => {
+  await routeLocalDistAssets(page);
   await mockOptionsRuntime(page, ['A-11111', 'B-22222']);
   await page.addInitScript(() => {
     window.confirm = () => true;
@@ -190,6 +194,7 @@ test('clear-all confirmation accepted clears all rows', async ({ page }) => {
 });
 
 test('refresh button re-reads snapshot and updates table', async ({ page }) => {
+  await routeLocalDistAssets(page);
   await mockOptionsRuntime(page, ['A-11111']);
   await page.goto('/options.html');
 

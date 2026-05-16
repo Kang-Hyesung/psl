@@ -7,11 +7,5 @@ export default defineConfig({
   workers: 1,
   use: {
     baseURL: 'http://127.0.0.1:4173'
-  },
-  webServer: {
-    command: 'npm run build && npx vite preview --host 127.0.0.1 --port 4173 --strictPort',
-    port: 4173,
-    timeout: 120000,
-    reuseExistingServer: !process.env.CI
   }
 });

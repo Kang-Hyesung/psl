@@ -9,7 +9,7 @@
     "lint": "tsc --noEmit --pretty false",
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run --config vitest.config.ts",
-    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:e2e": "npm run build && playwright test --config=playwright.config.ts",
     "manual:qa": "npm run build && node scripts/manual-qa-extension.mjs"
   },
   "devDependencies": {

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { routeLocalDistAssets } from './static-assets';
 
 async function mockPopupRuntime(
   page: Page,
@@ -94,6 +95,7 @@ async function mockPopupRuntime(
 }
 
 test('popup happy state shows hidden count, recent keys, and kyobo support status', async ({ page }) => {
+  await routeLocalDistAssets(page);
   await mockPopupRuntime(page, {
     hiddenKeys: ['A-11111', 'B-22222', 'C-33333', 'D-44444'],
     activeTabUrl: 'https://www.kyobobook.co.kr/product/detailViewKor.laf?barcode=12345'
@@ -112,6 +114,7 @@ test('popup happy state shows hidden count, recent keys, and kyobo support statu
 });
 
 test('popup empty state shows explicit empty message and unsupported tab status', async ({ page }) => {
+  await routeLocalDistAssets(page);
   await mockPopupRuntime(page, {
     hiddenKeys: [],
     activeTabUrl: 'https://example.com/not-kyobo'
@@ -127,6 +130,7 @@ test('popup empty state shows explicit empty message and unsupported tab status'
 });
 
 test('popup toggle button updates hide-engine status label', async ({ page }) => {
+  await routeLocalDistAssets(page);
   await mockPopupRuntime(page, {
     hiddenKeys: ['A-11111'],
     activeTabUrl: 'https://www.kyobobook.co.kr/search?keyword=test',

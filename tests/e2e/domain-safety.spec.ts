@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { routeLocalDistAssets } from './static-assets';
 
 test('content runtime keeps non-kyobo domain as no-op without page errors', async ({ page }) => {
+  await routeLocalDistAssets(page);
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
 
