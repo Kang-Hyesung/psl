@@ -63,14 +63,14 @@ export function resolveKyoboTabStatusFromUrl(url: string | null): KyoboTabStatus
 
 function toKyoboTabStatusLabel(status: KyoboTabStatus): string {
   if (status === 'supported') {
-    return 'Kyobo supported';
+    return '교보문고 지원됨';
   }
 
   if (status === 'unsupported') {
-    return 'Kyobo not supported';
+    return '교보문고 아님';
   }
 
-  return 'Current tab unavailable';
+  return '현재 탭 확인 불가';
 }
 
 async function readActiveTabUrl(): Promise<string | null> {
@@ -160,13 +160,13 @@ function renderRecentHiddenKeys(recentHiddenList: HTMLElement, recentHiddenKeys:
 function applyStatusToDom(elements: PopupDomElements, viewModel: PopupStatusViewModel): void {
   elements.hiddenCount.textContent = String(viewModel.snapshot.hiddenCount);
   elements.tabStatus.textContent = toKyoboTabStatusLabel(viewModel.kyoboTabStatus);
-  elements.hideEnabledStatus.textContent = viewModel.isHideEnabled ? 'On' : 'Off';
-  elements.toggleHideEnabledButton.textContent = viewModel.isHideEnabled ? 'Turn off hide' : 'Turn on hide';
+  elements.hideEnabledStatus.textContent = viewModel.isHideEnabled ? '켜짐' : '꺼짐';
+  elements.toggleHideEnabledButton.textContent = viewModel.isHideEnabled ? '숨김 끄기' : '숨김 켜기';
 
   if (viewModel.snapshot.isEmpty) {
     elements.recentHiddenList.hidden = true;
     elements.recentEmptyMessage.hidden = false;
-    elements.recentEmptyMessage.textContent = 'No hidden items yet.';
+    elements.recentEmptyMessage.textContent = '아직 숨긴 항목이 없습니다.';
     return;
   }
 

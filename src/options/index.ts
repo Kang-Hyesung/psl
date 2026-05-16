@@ -66,7 +66,7 @@ function normalizeHiddenKeys(snapshot: HideListStateSnapshot | null): string[] {
 
 function formatCreatedAt(createdAtMs: number): string {
   if (!Number.isFinite(createdAtMs) || createdAtMs <= 0) {
-    return 'Unknown';
+    return '알 수 없음';
   }
 
   return new Date(createdAtMs).toLocaleString();
@@ -148,7 +148,7 @@ function renderOptionsRows(rootDocument: Document, tableBody: HTMLElement, rows:
     const actionCell = rootDocument.createElement('td');
     const removeButton = rootDocument.createElement('button');
     removeButton.type = 'button';
-    removeButton.textContent = 'Remove';
+    removeButton.textContent = '삭제';
     removeButton.addEventListener('click', () => {
       void (async () => {
         removeButton.disabled = true;
@@ -176,7 +176,7 @@ async function clearAllHiddenKeys(hiddenKeys: readonly string[]): Promise<void> 
 
 function shouldClearAll(rootWindow: Window): boolean {
   try {
-    return rootWindow.confirm('Clear all hidden items?');
+    return rootWindow.confirm('숨긴 항목을 모두 삭제할까요?');
   } catch {
     return false;
   }

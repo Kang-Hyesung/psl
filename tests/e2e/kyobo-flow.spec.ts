@@ -277,7 +277,7 @@ test('kyobo happy-path flow covers hide, reload, dynamic add, and options unhide
   await routeKyoboFixture(optionsPage);
   await optionsPage.goto('https://www.kyobobook.co.kr/options.html');
   await optionsPage.waitForSelector('#hidden-items-body tr', { timeout: 10000 });
-  await optionsPage.click('button:has-text("Remove")');
+  await optionsPage.click('button:has-text("삭제")');
   await optionsPage.close();
 
   await page.reload();

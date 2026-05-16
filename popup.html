@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kyobo Hide List Popup</title>
+    <title>교보 숨김 목록 팝업</title>
     <link rel="stylesheet" href="/src/shared/saas-theme.css" />
     <style>
       body {
@@ -112,38 +112,38 @@
       <section class="popup-panel" aria-live="polite">
         <header class="popup-header">
           <div>
-            <h1>Kyobo Hide List</h1>
-            <p class="subtitle">Manage hidden Kyobo products from the current tab.</p>
+            <h1>교보 숨김 목록</h1>
+            <p class="subtitle">현재 탭에서 숨긴 교보문고 상품을 관리합니다.</p>
           </div>
-          <span class="status-badge is-on" aria-label="Extension ready">Ready</span>
+          <span class="status-badge is-on" aria-label="확장 프로그램 준비됨">준비됨</span>
         </header>
 
         <section class="metrics" aria-label="Hide list status">
           <div class="metric-row">
-            <span class="metric-label">Hidden items</span>
+            <span class="metric-label">숨긴 항목</span>
             <strong id="hidden-count" class="metric-value">0</strong>
           </div>
           <div class="metric-row">
-            <span class="metric-label">Current tab</span>
-            <strong id="tab-status" class="metric-value">Checking...</strong>
+            <span class="metric-label">현재 탭</span>
+            <strong id="tab-status" class="metric-value">확인 중...</strong>
           </div>
           <div class="metric-row">
-            <span class="metric-label">Hide engine</span>
-            <strong id="hide-enabled-status" class="metric-value">On</strong>
+            <span class="metric-label">숨김 기능</span>
+            <strong id="hide-enabled-status" class="metric-value">켜짐</strong>
           </div>
         </section>
 
-        <section class="recent-panel" aria-label="Recent hidden keys">
-          <p class="section-heading">Recent hidden keys</p>
+        <section class="recent-panel" aria-label="최근 숨긴 키">
+          <p class="section-heading">최근 숨긴 키</p>
           <ul id="recent-hidden-list" class="recent-list"></ul>
-          <p id="recent-empty-message" class="empty">No hidden items yet.</p>
+          <p id="recent-empty-message" class="empty">아직 숨긴 항목이 없습니다.</p>
         </section>
 
         <div class="actions">
-          <button id="refresh-button" type="button">Refresh status</button>
-          <button id="toggle-hide-enabled-button" type="button">Turn off hide</button>
-          <button id="open-hidden-list-button" type="button">Open hidden list</button>
-          <button id="open-options-button" class="primary" type="button">Open options</button>
+          <button id="refresh-button" type="button">상태 새로고침</button>
+          <button id="toggle-hide-enabled-button" type="button">숨김 끄기</button>
+          <button id="open-hidden-list-button" type="button">숨김 목록 열기</button>
+          <button id="open-options-button" class="primary" type="button">옵션 열기</button>
         </div>
       </section>
     </main>

@@ -12,12 +12,12 @@ describe('options row view model', () => {
     expect(rows).toHaveLength(2);
     expect(rows[0]).toEqual({
       hiddenKey: 'S000123456789',
-      createdAtLabel: 'Unknown',
+      createdAtLabel: '알 수 없음',
       originalLink: 'https://www.kyobobook.co.kr/search?keyword=S000123456789'
     });
     expect(rows[1]).toEqual({
       hiddenKey: 'https://www.kyobobook.co.kr/product/detailViewKor.laf?barcode=9791193078116&utm_source=test',
-      createdAtLabel: 'Unknown',
+      createdAtLabel: '알 수 없음',
       originalLink: 'https://www.kyobobook.co.kr/product/detailViewKor.laf'
     });
   });
@@ -38,7 +38,7 @@ describe('options row view model', () => {
     );
 
     expect(rows).toHaveLength(1);
-    expect(rows[0].createdAtLabel).not.toBe('Unknown');
+    expect(rows[0].createdAtLabel).not.toBe('알 수 없음');
     expect(rows[0].originalLink).toBe('https://www.kyobobook.co.kr/product/detailViewKor.laf');
   });
 

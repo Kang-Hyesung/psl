@@ -155,18 +155,18 @@ test('options page removes an item through row action', async ({ page }) => {
   await mockOptionsRuntime(page, ['S000123456789']);
   await page.goto('/options.html');
 
-  await expect(page.getByRole('heading', { name: 'Hidden List Management' })).toBeVisible();
-  await expect(page.getByText('Saved hidden items')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '숨김 목록 관리' })).toBeVisible();
+  await expect(page.getByText('저장된 숨김 항목', { exact: true })).toBeVisible();
   await expect(page.getByRole('table')).toBeVisible();
   await expect(page.locator('body')).not.toContainText('??');
   await expect(page.locator('#hidden-items-body tr')).toHaveCount(1);
   await expect(page.locator('#hidden-items-summary-count')).toHaveText('1');
 
-  await page.getByRole('button', { name: 'Remove' }).click();
+  await page.getByRole('button', { name: '삭제', exact: true }).click();
 
   await expect(page.locator('#hidden-items-body tr')).toHaveCount(0);
   await expect(page.locator('#hidden-items-summary-count')).toHaveText('0');
-  await expect(page.locator('#hidden-items-empty')).toHaveText('No hidden items saved.');
+  await expect(page.locator('#hidden-items-empty')).toHaveText('저장된 숨김 항목이 없습니다.');
   await expect(page.locator('#hidden-items-empty')).toBeVisible();
 });
 
@@ -178,7 +178,7 @@ test('clear-all cancellation keeps current list intact', async ({ page }) => {
   });
   await page.goto('/options.html');
 
-  await page.getByRole('button', { name: 'Clear all' }).click();
+  await page.getByRole('button', { name: '전체 삭제' }).click();
 
   await expect(page.locator('#hidden-items-body tr')).toHaveCount(2);
   await expect(page.locator('#hidden-items-empty')).toBeHidden();
@@ -192,7 +192,7 @@ test('clear-all confirmation accepted clears all rows', async ({ page }) => {
   });
   await page.goto('/options.html');
 
-  await page.getByRole('button', { name: 'Clear all' }).click();
+  await page.getByRole('button', { name: '전체 삭제' }).click();
 
   await expect(page.locator('#hidden-items-body tr')).toHaveCount(0);
   await expect(page.locator('#hidden-items-empty')).toBeVisible();
@@ -213,6 +213,6 @@ test('refresh button re-reads snapshot and updates table', async ({ page }) => {
     testWindow.__setOptionsHiddenKeysForTest?.(['A-11111', 'B-22222']);
   });
 
-  await page.getByRole('button', { name: 'Refresh' }).click();
+  await page.getByRole('button', { name: '새로고침' }).click();
   await expect(page.locator('#hidden-items-body tr')).toHaveCount(2);
 });

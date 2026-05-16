@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kyobo Hide List Options</title>
+    <title>교보 숨김 목록 옵션</title>
     <link rel="stylesheet" href="/src/shared/saas-theme.css" />
     <style>
       .page-shell {
@@ -169,49 +169,49 @@
     <main class="page-shell">
       <header class="page-header">
         <div>
-          <h1>Hidden List Management</h1>
-          <p class="desc">Review saved Kyobo product keys, open their source links, and remove entries that should appear again.</p>
+          <h1>숨김 목록 관리</h1>
+          <p class="desc">저장된 교보문고 상품 키를 확인하고, 원본 링크를 열거나 다시 표시할 항목을 삭제합니다.</p>
         </div>
         <div class="toolbar">
-          <button id="refresh-options-button" type="button">Refresh</button>
-          <button id="clear-all-button" class="danger" type="button">Clear all</button>
+          <button id="refresh-options-button" type="button">새로고침</button>
+          <button id="clear-all-button" class="danger" type="button">전체 삭제</button>
         </div>
       </header>
 
-      <section class="summary-grid" aria-label="Hidden list summary">
+      <section class="summary-grid" aria-label="숨김 목록 요약">
         <div class="summary-card">
-          <span class="metric-label">Saved hidden items</span>
+          <span class="metric-label">저장된 숨김 항목</span>
           <strong id="hidden-items-summary-count">-</strong>
         </div>
         <div class="summary-card">
-          <span class="metric-label">Storage scope</span>
-          <strong>Local</strong>
+          <span class="metric-label">저장 위치</span>
+          <strong>로컬</strong>
         </div>
         <div class="summary-card">
-          <span class="metric-label">Supported site</span>
-          <strong>Kyobo</strong>
+          <span class="metric-label">지원 사이트</span>
+          <strong>교보문고</strong>
         </div>
       </section>
 
       <section class="table-panel" aria-live="polite">
         <div class="table-header">
-          <h2>Hidden products</h2>
-          <span class="status-badge is-on">Synced</span>
+          <h2>숨긴 상품</h2>
+          <span class="status-badge is-on">동기화됨</span>
         </div>
 
         <table>
           <thead>
             <tr>
-              <th scope="col">Key</th>
-              <th scope="col">Created at</th>
-              <th scope="col">Original link</th>
-              <th scope="col">Action</th>
+              <th scope="col">키</th>
+              <th scope="col">생성일</th>
+              <th scope="col">원본 링크</th>
+              <th scope="col">작업</th>
             </tr>
           </thead>
           <tbody id="hidden-items-body"></tbody>
         </table>
 
-        <p id="hidden-items-empty" class="empty" hidden>No hidden items saved.</p>
+        <p id="hidden-items-empty" class="empty" hidden>저장된 숨김 항목이 없습니다.</p>
       </section>
     </main>
     <script type="module" src="/src/options/index.ts"></script>

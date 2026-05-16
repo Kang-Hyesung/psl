@@ -103,15 +103,15 @@ test('popup happy state shows hidden count, recent keys, and kyobo support statu
 
   await page.goto('/popup.html');
 
-  await expect(page.getByRole('heading', { name: 'Kyobo Hide List' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '교보 숨김 목록' })).toBeVisible();
   await expect(page.locator('body')).not.toContainText('??');
-  await expect(page.locator('#tab-status')).toHaveText('Kyobo supported');
-  await expect(page.getByRole('button', { name: 'Open options' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Refresh status' })).toBeVisible();
+  await expect(page.locator('#tab-status')).toHaveText('교보문고 지원됨');
+  await expect(page.getByRole('button', { name: '옵션 열기' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '상태 새로고침' })).toBeVisible();
   await expect(page.locator('#hidden-count')).toHaveText('4');
-  await expect(page.locator('#tab-status')).toHaveText('Kyobo supported');
-  await expect(page.locator('#hide-enabled-status')).toHaveText('On');
-  await expect(page.getByRole('button', { name: 'Turn off hide' })).toBeVisible();
+  await expect(page.locator('#tab-status')).toHaveText('교보문고 지원됨');
+  await expect(page.locator('#hide-enabled-status')).toHaveText('켜짐');
+  await expect(page.getByRole('button', { name: '숨김 끄기' })).toBeVisible();
   await expect(page.locator('#recent-hidden-list li')).toHaveCount(3);
   await expect(page.locator('#recent-hidden-list li').first()).toHaveText('D-44444');
   await expect(page.locator('#recent-empty-message')).toBeHidden();
@@ -127,10 +127,10 @@ test('popup empty state shows explicit empty message and unsupported tab status'
   await page.goto('/popup.html');
 
   await expect(page.locator('#hidden-count')).toHaveText('0');
-  await expect(page.locator('#tab-status')).toHaveText('Kyobo not supported');
-  await expect(page.locator('#hide-enabled-status')).toHaveText('On');
+  await expect(page.locator('#tab-status')).toHaveText('교보문고 아님');
+  await expect(page.locator('#hide-enabled-status')).toHaveText('켜짐');
   await expect(page.locator('#recent-hidden-list')).toBeHidden();
-  await expect(page.locator('#recent-empty-message')).toHaveText('No hidden items yet.');
+  await expect(page.locator('#recent-empty-message')).toHaveText('아직 숨긴 항목이 없습니다.');
 });
 
 test('popup toggle button updates hide-engine status label', async ({ page }) => {
@@ -143,8 +143,8 @@ test('popup toggle button updates hide-engine status label', async ({ page }) =>
 
   await page.goto('/popup.html');
 
-  await expect(page.locator('#hide-enabled-status')).toHaveText('On');
-  await page.getByRole('button', { name: 'Turn off hide' }).click();
-  await expect(page.locator('#hide-enabled-status')).toHaveText('Off');
-  await expect(page.getByRole('button', { name: 'Turn on hide' })).toBeVisible();
+  await expect(page.locator('#hide-enabled-status')).toHaveText('켜짐');
+  await page.getByRole('button', { name: '숨김 끄기' }).click();
+  await expect(page.locator('#hide-enabled-status')).toHaveText('꺼짐');
+  await expect(page.getByRole('button', { name: '숨김 켜기' })).toBeVisible();
 });
