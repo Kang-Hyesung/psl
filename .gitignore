@@ -1,0 +1,14 @@
+node_modules/
+dist/
+test-results/
+.vitest-attachments/
+.tmp-manual-qa-profile/
+.sisyphus/
+coverage/
+
+.env
+.env.*
+*.log
+
+.DS_Store
+Thumbs.db

@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Kyobo Hide List",
+  "version": "0.1.0",
+  "description": "Task 1 scaffold for Kyobo hide list extension.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.kyobobook.co.kr/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.kyobobook.co.kr/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Kyobo Hide List"
+  },
+  "options_page": "options.html"
+}

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kyobo Hide List Options</title>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --surface: #ffffff;
+        --border: #d7deea;
+        --text: #1d2533;
+        --muted: #5a6578;
+        --accent: #1f6feb;
+        --danger: #b42318;
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Noto Serif KR', Georgia, serif;
+      }
+
+      .page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 24px var(--space-4) 32px;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: var(--space-4);
+        display: grid;
+        gap: var(--space-3);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .desc {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--space-2);
+      }
+
+      button {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--text);
+        font-size: 12px;
+        padding: var(--space-2) var(--space-3);
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      button.danger {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        text-align: left;
+        border-top: 1px solid var(--border);
+        padding: var(--space-2) var(--space-1);
+        font-size: 12px;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      td:first-child {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      a {
+        color: var(--accent);
+        word-break: break-all;
+      }
+
+      .empty {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="panel" aria-live="polite">
+        <h1>Hidden List Management</h1>
+        <p class="desc">Review hidden keys, remove individual entries, or clear all.</p>
+
+        <div class="actions">
+          <button id="refresh-options-button" type="button">Refresh</button>
+          <button id="clear-all-button" class="danger" type="button">Clear all</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Key</th>
+              <th scope="col">Created at</th>
+              <th scope="col">Original link</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody id="hidden-items-body"></tbody>
+        </table>
+
+        <p id="hidden-items-empty" class="empty" hidden>No hidden items saved.</p>
+      </section>
+    </main>
+    <script type="module" src="./index.ts"></script>
+  </body>
+</html>
