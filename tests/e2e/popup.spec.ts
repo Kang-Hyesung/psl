@@ -104,6 +104,10 @@ test('popup happy state shows hidden count, recent keys, and kyobo support statu
   await page.goto('/popup.html');
 
   await expect(page.getByRole('heading', { name: 'Kyobo Hide List' })).toBeVisible();
+  await expect(page.locator('body')).not.toContainText('??');
+  await expect(page.locator('#tab-status')).toHaveText('Kyobo supported');
+  await expect(page.getByRole('button', { name: 'Open options' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Refresh status' })).toBeVisible();
   await expect(page.locator('#hidden-count')).toHaveText('4');
   await expect(page.locator('#tab-status')).toHaveText('Kyobo supported');
   await expect(page.locator('#hide-enabled-status')).toHaveText('On');
