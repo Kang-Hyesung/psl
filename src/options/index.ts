@@ -32,6 +32,7 @@ interface OptionsRowViewModel {
 interface OptionsDomElements {
   tableBody: HTMLElement;
   emptyMessage: HTMLElement;
+  summaryCount: HTMLElement;
   refreshButton: HTMLButtonElement;
   clearAllButton: HTMLButtonElement;
 }
@@ -94,19 +95,31 @@ export function createOptionsRowViewModels(
   }));
 }
 
+export function renderOptionsSummaryCount(summaryCount: HTMLElement, rows: readonly OptionsRowViewModel[]): void {
+  summaryCount.textContent = String(rows.length);
+}
+
 function readOptionsDomElements(rootDocument: Document): OptionsDomElements | null {
   const tableBody = rootDocument.getElementById('hidden-items-body');
   const emptyMessage = rootDocument.getElementById('hidden-items-empty');
+  const summaryCount = rootDocument.getElementById('hidden-items-summary-count');
   const refreshButton = rootDocument.getElementById('refresh-options-button');
   const clearAllButton = rootDocument.getElementById('clear-all-button');
 
-  if (!tableBody || !emptyMessage || !(refreshButton instanceof HTMLButtonElement) || !(clearAllButton instanceof HTMLButtonElement)) {
+  if (
+    !tableBody ||
+    !emptyMessage ||
+    !summaryCount ||
+    !(refreshButton instanceof HTMLButtonElement) ||
+    !(clearAllButton instanceof HTMLButtonElement)
+  ) {
     return null;
   }
 
   return {
     tableBody,
     emptyMessage,
+    summaryCount,
     refreshButton,
     clearAllButton
   };
@@ -179,6 +192,7 @@ export async function refreshOptionsUi(rootDocument: Document): Promise<void> {
   const metadataPromise = optionsMetadataRepository ? optionsMetadataRepository.listItems() : Promise.resolve([] as HiddenKeyMetadata[]);
   const [snapshot, metadataItems] = await Promise.all([readOptionsHideListSnapshot(), metadataPromise]);
   const rows = createOptionsRowViewModels(snapshot, metadataItems);
+  renderOptionsSummaryCount(elements.summaryCount, rows);
   renderOptionsRows(rootDocument, elements.tableBody, rows);
 
   const isEmpty = rows.length === 0;

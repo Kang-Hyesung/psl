@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createOptionsRowViewModels } from '../../../src/options/index';
+import { createOptionsRowViewModels, renderOptionsSummaryCount } from '../../../src/options/index';
 
 describe('options row view model', () => {
   it('builds rows from hidden keys with deterministic fallback values', () => {
@@ -44,5 +44,19 @@ describe('options row view model', () => {
 
   it('returns empty rows for null snapshot', () => {
     expect(createOptionsRowViewModels(null)).toEqual([]);
+  });
+
+  it('renders the hidden item summary count from current rows', () => {
+    const summaryCount = { textContent: '-' } as HTMLElement;
+    const rows = createOptionsRowViewModels({
+      revision: 1,
+      hiddenKeys: ['S000123456789']
+    });
+
+    renderOptionsSummaryCount(summaryCount, rows);
+    expect(summaryCount.textContent).toBe('1');
+
+    renderOptionsSummaryCount(summaryCount, []);
+    expect(summaryCount.textContent).toBe('0');
   });
 });
