@@ -4,6 +4,7 @@ test-results/
 .vitest-attachments/
 .tmp-manual-qa-profile/
 .sisyphus/
+qa-captures/
 coverage/
 
 .env
