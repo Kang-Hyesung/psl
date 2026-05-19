@@ -64,9 +64,9 @@ export async function persistAndHideCard(
   card.hide();
 }
 
-export async function runHideContentFlow(input: RunHideContentFlowInput): Promise<void> {
+export async function runHideContentFlow(input: RunHideContentFlowInput): Promise<string[]> {
   if (!input.adapter.supports(input.url)) {
-    return;
+    return [];
   }
 
   let persistedHiddenKeys: string[] = [];
@@ -96,4 +96,6 @@ export async function runHideContentFlow(input: RunHideContentFlowInput): Promis
       // Per-card no-op safety to avoid breaking the whole page.
     }
   }
+
+  return persistedHiddenKeys;
 }

@@ -1,11 +1,14 @@
 import { copyFile, mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { build as buildWithEsbuild } from 'esbuild';
 import { defineConfig } from 'vite';
 
 function copyManifestPlugin() {
   const manifestPath = resolve(__dirname, 'manifest.json');
   const distDirPath = resolve(__dirname, 'dist');
   const distManifestPath = resolve(distDirPath, 'manifest.json');
+  const contentEntryPath = resolve(__dirname, 'src/content/index.ts');
+  const distContentPath = resolve(distDirPath, 'content.js');
 
   const sleep = async (timeoutMs: number): Promise<void> => {
     await new Promise((resolveTimer) => {
@@ -37,9 +40,24 @@ function copyManifestPlugin() {
     }
   };
 
+  const bundleContentScriptAsClassicScript = async (): Promise<void> => {
+    await buildWithEsbuild({
+      entryPoints: [contentEntryPath],
+      outfile: distContentPath,
+      bundle: true,
+      format: 'iife',
+      platform: 'browser',
+      target: 'chrome109',
+      charset: 'utf8',
+      minify: true,
+      logLevel: 'silent'
+    });
+  };
+
   return {
     name: 'copy-manifest',
     async closeBundle() {
+      await bundleContentScriptAsClassicScript();
       await copyManifestWithRetry();
     }
   };

@@ -28,6 +28,9 @@ class InMemoryStorageDriver implements StorageDriver {
 
 class FakeRuntimePort implements RuntimeMessagePort {
   private readonly listeners = new Set<RuntimeMessageListener>();
+  public stateSyncCallbackCount = 0;
+  public returnRejectedStateSyncPromise = false;
+  public stateSyncRejectedPromiseCatchCount = 0;
 
   public readonly onMessage = {
     addListener: (listener: RuntimeMessageListener): void => {
@@ -38,7 +41,17 @@ class FakeRuntimePort implements RuntimeMessagePort {
     }
   };
 
-  public sendMessage(message: unknown, responseCallback?: (response?: unknown) => void): void {
+  public sendMessage(message: unknown, responseCallback?: (response?: unknown) => void): unknown {
+    const isStateSyncMessage =
+      typeof message === 'object' &&
+      message !== null &&
+      'type' in message &&
+      (message as { type?: unknown }).type === 'hide-list/state-sync';
+
+    if (isStateSyncMessage && responseCallback) {
+      this.stateSyncCallbackCount += 1;
+    }
+
     let responseSent = false;
 
     const sendResponse = (response?: unknown): void => {
@@ -57,6 +70,16 @@ class FakeRuntimePort implements RuntimeMessagePort {
         // No-op for test harness parity with extension runtime safety.
       }
     }
+
+    if (isStateSyncMessage && this.returnRejectedStateSyncPromise) {
+      return {
+        catch: () => {
+          this.stateSyncRejectedPromiseCatchCount += 1;
+        }
+      };
+    }
+
+    return undefined;
   }
 }
 
@@ -104,6 +127,7 @@ describe('Task 9 cross-context sync messaging', () => {
     expect(mutationResult?.state.hiddenKeys).toEqual(['S000123456789']);
     expect(optionsSyncRevisions).toEqual([1]);
     expect(contentSyncRevisions).toEqual([1]);
+    expect(runtime.stateSyncCallbackCount).toBe(1);
 
     await expect(
       optionsClient.requestSnapshot({
@@ -116,6 +140,33 @@ describe('Task 9 cross-context sync messaging', () => {
 
     unsubscribeContent();
     unsubscribeOptions();
+    stopService();
+  });
+
+  it('attaches a callback to background sync broadcasts to avoid unhandled no-receiver rejections', async () => {
+    const runtime = new FakeRuntimePort();
+    runtime.returnRejectedStateSyncPromise = true;
+    const repository = new LocalStorageRepository(new InMemoryStorageDriver());
+    const service = createHideListSyncBackgroundService({
+      runtime,
+      repository
+    });
+    const stopService = service.start();
+
+    const popupClient = createHideListSyncClient({
+      source: 'popup',
+      runtime,
+      requestTimeoutMs: 50
+    });
+
+    await popupClient.mutateHiddenKey('add', 'S000123456789', {
+      requestId: 'popup-add-with-broadcast-callback',
+      issuedAtMs: 100
+    });
+
+    expect(runtime.stateSyncCallbackCount).toBe(1);
+    expect(runtime.stateSyncRejectedPromiseCatchCount).toBe(1);
+
     stopService();
   });
 

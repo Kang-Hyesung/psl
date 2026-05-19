@@ -1,12 +1,23 @@
 import type { AdapterCard, SiteAdapter } from '../adapters/site-adapter';
 import type { RuntimeCard } from './runtime';
 
-export const RUNTIME_CARD_SELECTOR = 'article.prod_item';
+const PRIMARY_RUNTIME_CARD_SELECTOR = 'li.prod_item, article.prod_item';
+const FALLBACK_RUNTIME_CARD_SELECTOR = '.prod_area';
+
+export const RUNTIME_CARD_SELECTOR = `${PRIMARY_RUNTIME_CARD_SELECTOR}, ${FALLBACK_RUNTIME_CARD_SELECTOR}`;
 
 export const HIDE_BUTTON_MARKER_ATTRIBUTE = 'data-kyobo-hide-list-hide-button';
 export const HIDE_BUTTON_MARKER_VALUE = 'true';
 export const HIDE_BUTTON_CLASS_NAME = 'kyobo-hide-list-hide-button';
 export const HIDDEN_CARD_MARKER_ATTRIBUTE = 'data-kyobo-hide-list-hidden';
+
+type HideButtonVariant = 'full' | 'compact';
+
+interface InsertionAnchor {
+  element: HTMLElement;
+  selector: string;
+  insertionPosition: InsertPosition;
+}
 
 function readAdapterCardFromElement(cardElement: HTMLElement): AdapterCard {
   const attributes: Record<string, string> = {};
@@ -21,23 +32,89 @@ function readAdapterCardFromElement(cardElement: HTMLElement): AdapterCard {
   };
 }
 
-function selectInsertionAnchor(cardElement: HTMLElement, selectorCandidates: readonly string[]): HTMLElement | null {
+function selectInsertionAnchor(cardElement: HTMLElement, selectorCandidates: readonly string[], defaultInsertionPosition: InsertPosition): InsertionAnchor | null {
   for (const selector of selectorCandidates) {
     const anchor = cardElement.querySelector<HTMLElement>(selector);
 
-    if (anchor) {
-      return anchor;
+    if (anchor && isElementVisibleForInsertion(anchor)) {
+      return {
+        element: anchor,
+        selector,
+        insertionPosition: selector === '.prod_bottom' ? 'afterend' : defaultInsertionPosition
+      };
     }
   }
 
   return null;
 }
 
-function createHideButton(ownerDocument: Document, onClick: () => Promise<void> | void): HTMLButtonElement {
+function isElementVisibleForInsertion(element: HTMLElement): boolean {
+  const ownerWindow = element.ownerDocument.defaultView;
+
+  if (!ownerWindow) {
+    return true;
+  }
+
+  for (let currentElement: HTMLElement | null = element; currentElement; currentElement = currentElement.parentElement) {
+    const style = ownerWindow.getComputedStyle(currentElement);
+
+    if (style.display === 'none' || style.visibility === 'hidden') {
+      return false;
+    }
+  }
+
+  return element.getClientRects().length > 0;
+}
+
+function isInjectedButtonVisible(buttonElement: HTMLElement): boolean {
+  const ownerWindow = buttonElement.ownerDocument.defaultView;
+
+  if (!ownerWindow || buttonElement.getClientRects().length === 0) {
+    return false;
+  }
+
+  const style = ownerWindow.getComputedStyle(buttonElement);
+  return style.display !== 'none' && style.visibility !== 'hidden';
+}
+
+function resolveHideButtonVariant(anchorSelector: string | null): HideButtonVariant {
+  if (!anchorSelector) {
+    return 'compact';
+  }
+
+  return anchorSelector.includes('prod_btn') ? 'full' : 'compact';
+}
+
+function createHideButton(ownerDocument: Document, variant: HideButtonVariant, onClick: () => Promise<void> | void): HTMLButtonElement {
   const buttonElement = ownerDocument.createElement('button');
   buttonElement.type = 'button';
-  buttonElement.textContent = '숨기기';
+  buttonElement.textContent = '\uC228\uAE30\uAE30';
   buttonElement.className = HIDE_BUTTON_CLASS_NAME;
+  Object.assign(buttonElement.style, {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxSizing: 'border-box',
+    position: variant === 'full' ? 'static' : 'absolute',
+    top: variant === 'full' ? 'auto' : '0',
+    right: variant === 'full' ? 'auto' : '0',
+    zIndex: variant === 'full' ? 'auto' : '10',
+    minHeight: variant === 'full' ? '32px' : '28px',
+    width: variant === 'full' ? '100%' : 'auto',
+    minWidth: variant === 'full' ? '0' : '64px',
+    padding: variant === 'full' ? '0 12px' : '0 10px',
+    marginTop: variant === 'full' ? '8px' : '0',
+    marginLeft: '0',
+    border: '1px solid #f1b8b2',
+    borderRadius: '6px',
+    background: '#fff7f6',
+    color: '#b42318',
+    fontSize: '12px',
+    fontWeight: '600',
+    lineHeight: '1',
+    cursor: 'pointer',
+    flex: '0 0 auto'
+  });
   buttonElement.setAttribute(HIDE_BUTTON_MARKER_ATTRIBUTE, HIDE_BUTTON_MARKER_VALUE);
   buttonElement.addEventListener('click', (event) => {
     event.preventDefault();
@@ -47,8 +124,44 @@ function createHideButton(ownerDocument: Document, onClick: () => Promise<void> 
   return buttonElement;
 }
 
+function prepareCardForHideButton(cardElement: HTMLElement, variant: HideButtonVariant, ownerDocument: Document): void {
+  if (variant !== 'compact') {
+    return;
+  }
+
+  const ownerWindow = ownerDocument.defaultView;
+
+  if (!ownerWindow) {
+    cardElement.style.position = cardElement.style.position || 'relative';
+    return;
+  }
+
+  if (ownerWindow.getComputedStyle(cardElement).position === 'static') {
+    cardElement.style.position = 'relative';
+  }
+}
+
+function isProductLikeElement(cardElement: HTMLElement): boolean {
+  return (
+    cardElement.hasAttribute('data-prod-id') ||
+    cardElement.hasAttribute('data-id') ||
+    cardElement.querySelector('a[href*="/detail/"], a[href*="detailView"]') !== null
+  );
+}
+
+function selectRuntimeCardElements(rootDocument: Document): HTMLElement[] {
+  const primaryCardElements = Array.from(rootDocument.querySelectorAll<HTMLElement>(PRIMARY_RUNTIME_CARD_SELECTOR));
+  const fallbackCardElements = Array.from(rootDocument.querySelectorAll<HTMLElement>(FALLBACK_RUNTIME_CARD_SELECTOR)).filter(
+    (cardElement) =>
+      cardElement.closest(PRIMARY_RUNTIME_CARD_SELECTOR) === null &&
+      isProductLikeElement(cardElement)
+  );
+
+  return [...primaryCardElements, ...fallbackCardElements];
+}
+
 export function createDomRuntimeCards(rootDocument: Document, adapter: SiteAdapter): RuntimeCard[] {
-  const cardElements = Array.from(rootDocument.querySelectorAll<HTMLElement>(RUNTIME_CARD_SELECTOR));
+  const cardElements = selectRuntimeCardElements(rootDocument);
 
   return cardElements.map((cardElement) => {
     const adapterCard = readAdapterCardFromElement(cardElement);
@@ -56,11 +169,23 @@ export function createDomRuntimeCards(rootDocument: Document, adapter: SiteAdapt
     return {
       adapterCard,
       hasHideButton(): boolean {
-        return cardElement.querySelector(`[${HIDE_BUTTON_MARKER_ATTRIBUTE}="${HIDE_BUTTON_MARKER_VALUE}"]`) !== null;
+        const hideButton = cardElement.querySelector<HTMLElement>(
+          `[${HIDE_BUTTON_MARKER_ATTRIBUTE}="${HIDE_BUTTON_MARKER_VALUE}"]`
+        );
+
+        return hideButton !== null && isInjectedButtonVisible(hideButton);
       },
       injectHideButton(onClick: () => Promise<void> | void): void {
-        if (this.hasHideButton()) {
-          return;
+        const existingHideButton = cardElement.querySelector<HTMLElement>(
+          `[${HIDE_BUTTON_MARKER_ATTRIBUTE}="${HIDE_BUTTON_MARKER_VALUE}"]`
+        );
+
+        if (existingHideButton) {
+          if (isInjectedButtonVisible(existingHideButton)) {
+            return;
+          }
+
+          existingHideButton.remove();
         }
 
         const hideButtonHook = adapter.getHideButtonHook(adapterCard);
@@ -69,11 +194,13 @@ export function createDomRuntimeCards(rootDocument: Document, adapter: SiteAdapt
           return;
         }
 
-        const anchor = selectInsertionAnchor(cardElement, hideButtonHook.anchorSelectorCandidates);
-        const hideButton = createHideButton(rootDocument, onClick);
+        const anchor = selectInsertionAnchor(cardElement, hideButtonHook.anchorSelectorCandidates, hideButtonHook.insertionPosition);
+        const hideButtonVariant = resolveHideButtonVariant(anchor?.selector ?? null);
+        prepareCardForHideButton(cardElement, hideButtonVariant, rootDocument);
+        const hideButton = createHideButton(rootDocument, hideButtonVariant, onClick);
 
         if (anchor) {
-          anchor.insertAdjacentElement(hideButtonHook.insertionPosition, hideButton);
+          anchor.element.insertAdjacentElement(anchor.insertionPosition, hideButton);
           return;
         }
 

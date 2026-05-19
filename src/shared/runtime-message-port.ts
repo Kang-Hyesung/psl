@@ -7,7 +7,7 @@ export type RuntimeMessageListener = (
 ) => void | boolean;
 
 export interface RuntimeMessagePort {
-  sendMessage(message: unknown, responseCallback?: RuntimeMessageResponseCallback): void;
+  sendMessage(message: unknown, responseCallback?: RuntimeMessageResponseCallback): unknown;
   onMessage: {
     addListener(listener: RuntimeMessageListener): void;
     removeListener(listener: RuntimeMessageListener): void;

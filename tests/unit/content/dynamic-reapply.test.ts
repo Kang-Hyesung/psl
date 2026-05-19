@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { KyoboAdapter } from '../../../src/adapters/kyobo-adapter';
+import { RUNTIME_CARD_SELECTOR } from '../../../src/content/dom-runtime-cards';
 import {
   createMutationObserverEventSource,
   createWindowEventSource,
@@ -332,7 +333,7 @@ describe('dynamic reapply runtime Task 8 behavior', () => {
     const eventSource = createMutationObserverEventSource(
       documentRoot,
       FakeMutationObserver as unknown as typeof MutationObserver,
-      'article.prod_item'
+      RUNTIME_CARD_SELECTOR
     );
 
     const unsubscribe = eventSource.subscribe(() => {
@@ -358,7 +359,7 @@ describe('dynamic reapply runtime Task 8 behavior', () => {
     observer.emit([
       createMutationRecordWithNodes([
         {
-          matches: (selector: string) => selector === 'article.prod_item'
+          matches: (selector: string) => selector === RUNTIME_CARD_SELECTOR
         }
       ])
     ]);
@@ -369,11 +370,11 @@ describe('dynamic reapply runtime Task 8 behavior', () => {
         [
           createMutationRecordWithNodes([
             {
-              querySelector: (selector: string) => (selector === 'article.prod_item' ? ({} as Element) : null)
+              querySelector: (selector: string) => (selector === RUNTIME_CARD_SELECTOR ? ({} as Element) : null)
             }
           ])
         ],
-        'article.prod_item'
+        RUNTIME_CARD_SELECTOR
       )
     ).toBe(true);
 

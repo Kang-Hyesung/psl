@@ -1,4 +1,5 @@
 import type { SiteAdapter } from '../adapters/site-adapter';
+import type { CardReplenisher } from './card-replenishment';
 import { runHideContentFlow, type HiddenKeyRepository, type HideListMutationPublisher, type RuntimeCard } from './runtime';
 
 type TimeoutHandle = ReturnType<typeof setTimeout>;
@@ -6,7 +7,9 @@ type TimeoutHandle = ReturnType<typeof setTimeout>;
 const DEFAULT_REAPPLY_DEBOUNCE_MS = 80;
 const DEFAULT_MUTATION_OBSERVER_OPTIONS: MutationObserverInit = {
   childList: true,
-  subtree: true
+  subtree: true,
+  attributes: true,
+  attributeFilter: ['class', 'style']
 };
 
 interface QueryableNode {
@@ -29,6 +32,7 @@ export interface DynamicReapplyFlowInput {
   adapter: SiteAdapter;
   repository: HiddenKeyRepository;
   mutationPublisher?: HideListMutationPublisher;
+  replenisher?: CardReplenisher;
   isEnabled?: () => boolean | Promise<boolean>;
   onDisabledPass?: () => void | Promise<void>;
   readUrl: () => string;
@@ -60,6 +64,10 @@ function matchesCardSelector(node: Node, cardSelector: string): boolean {
 
 export function hasRelevantCardAddition(mutations: readonly MutationRecord[], cardSelector: string): boolean {
   for (const mutation of mutations) {
+    if (mutation.type === 'attributes' && isRelevantCardAttributeMutation(mutation, cardSelector)) {
+      return true;
+    }
+
     const addedNodes = Array.from(mutation.addedNodes);
 
     for (const node of addedNodes) {
@@ -70,6 +78,24 @@ export function hasRelevantCardAddition(mutations: readonly MutationRecord[], ca
   }
 
   return false;
+}
+
+function isRelevantCardAttributeMutation(mutation: MutationRecord, cardSelector: string): boolean {
+  const targetElement = mutation.target instanceof Element ? mutation.target : null;
+
+  if (!targetElement) {
+    return false;
+  }
+
+  if (targetElement.matches(cardSelector) || targetElement.querySelector(cardSelector)) {
+    return true;
+  }
+
+  if (targetElement.closest(cardSelector)) {
+    return true;
+  }
+
+  return targetElement.matches('.prod_list, .prod_area, .prod_btn_wrap, .prod_bottom');
 }
 
 function createDynamicReapplyScheduler(input: DynamicReapplySchedulerInput): DynamicReapplyFlowHandle {
@@ -139,14 +165,14 @@ function createDynamicReapplyScheduler(input: DynamicReapplySchedulerInput): Dyn
 
 export function createWindowEventSource(
   eventTarget: Pick<Window, 'addEventListener' | 'removeEventListener'>,
-  eventName: 'popstate' | 'hashchange'
+  eventName: 'popstate' | 'hashchange' | 'click'
 ): ReapplyEventSource {
   return {
     subscribe(onSignal: () => void): () => void {
-      eventTarget.addEventListener(eventName, onSignal);
+      eventTarget.addEventListener(eventName, onSignal, true);
 
       return () => {
-        eventTarget.removeEventListener(eventName, onSignal);
+        eventTarget.removeEventListener(eventName, onSignal, true);
       };
     }
   };
@@ -223,13 +249,20 @@ export function startDynamicReapplyFlow(input: DynamicReapplyFlowInput): Dynamic
         return;
       }
 
-      await runHideContentFlow({
+      const hiddenKeys = await runHideContentFlow({
         url,
         adapter: input.adapter,
         repository: input.repository,
         mutationPublisher: input.mutationPublisher,
         cards: input.readCards()
       });
+
+      if (input.replenisher) {
+        await input.replenisher.replenish({
+          url,
+          hiddenKeys
+        });
+      }
     }
   });
 

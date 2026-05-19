@@ -333,13 +333,15 @@ async function main() {
         <head><meta charset="utf-8" /><title>Kyobo Fixture</title></head>
         <body>
           <main id="kyobo-root">
-            <article id="card-a" class="prod_item" data-prod-id="9791193078116">
-              <div class="prod_info"><a href="/product/detailViewKor.laf?productId=S000123456789">A</a></div>
-              <div class="prod_btn_area"></div>
-            </article>
+            <li id="card-a" class="prod_item" data-id="S000123456789">
+              <div class="prod_area">
+                <div class="prod_info_box"><a class="prod_info" href="https://product.kyobobook.co.kr/detail/S000123456789">A</a></div>
+              </div>
+              <div class="prod_btn_wrap"><div class="btn_wrap full"></div></div>
+            </li>
             ${
               includeDynamicCard
-                ? '<article id="card-b" class="prod_item" data-prod-id="9791193078116"><div class="prod_info"><a href="/product/detailViewKor.laf?productId=S000123456789">B</a></div><div class="prod_btn_area"></div></article>'
+                ? '<li id="card-b" class="prod_item" data-id="S000123456789"><div class="prod_area"><div class="prod_info_box"><a class="prod_info" href="https://product.kyobobook.co.kr/detail/S000123456789">B</a></div></div><div class="prod_btn_wrap"><div class="btn_wrap full"></div></div></li>'
                 : ''
             }
           </main>
@@ -361,7 +363,7 @@ async function main() {
 
     const page = await context.newPage();
     await page.goto('https://www.kyobobook.co.kr/search?keyword=test');
-    await page.addScriptTag({ type: 'module', url: 'https://www.kyobobook.co.kr/content.js' });
+    await page.addScriptTag({ url: 'https://www.kyobobook.co.kr/content.js' });
     log('opened kyobo fixture page');
 
     await page.waitForSelector('[data-kyobo-hide-list-hide-button="true"]', { timeout: 10000, state: 'attached' });
@@ -383,14 +385,14 @@ async function main() {
     await captureCheckpoint(page, 'manual-qa-kyobo-hide.png', 'Card A hidden after hide action');
 
     await page.reload();
-    await page.addScriptTag({ type: 'module', url: 'https://www.kyobobook.co.kr/content.js' });
+    await page.addScriptTag({ url: 'https://www.kyobobook.co.kr/content.js' });
     await page.waitForSelector('#card-a[data-kyobo-hide-list-hidden="true"]', { timeout: 10000, state: 'attached' });
     log('hidden card persisted after reload');
     await pauseAtCheckpoint(page, 'Card A still hidden after reload');
     await captureCheckpoint(page, 'manual-qa-kyobo-reload-hidden.png', 'Card A still hidden after reload');
 
     await page.goto('https://www.kyobobook.co.kr/search?keyword=test&dynamic=1');
-    await page.addScriptTag({ type: 'module', url: 'https://www.kyobobook.co.kr/content.js' });
+    await page.addScriptTag({ url: 'https://www.kyobobook.co.kr/content.js' });
     await page.waitForSelector('#card-b[data-kyobo-hide-list-hidden="true"]', { timeout: 10000, state: 'attached' });
     log('dynamic card auto-hidden by reapply engine');
     await pauseAtCheckpoint(page, 'Dynamic card B auto-hidden after reapply');
@@ -407,7 +409,7 @@ async function main() {
 
     await page.bringToFront();
     await page.reload();
-    await page.addScriptTag({ type: 'module', url: 'https://www.kyobobook.co.kr/content.js' });
+    await page.addScriptTag({ url: 'https://www.kyobobook.co.kr/content.js' });
     await page.waitForSelector('#card-a:not([data-kyobo-hide-list-hidden])', { timeout: 10000 });
     await page.waitForSelector('#card-b:not([data-kyobo-hide-list-hidden])', { timeout: 10000 });
     log('unhide reflected back to kyobo page');

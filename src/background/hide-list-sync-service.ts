@@ -40,6 +40,34 @@ function dedupeHiddenKeys(hiddenKeys: readonly string[]): string[] {
   return deduped;
 }
 
+function consumeRuntimeLastError(): void {
+  if (typeof chrome === 'undefined' || !chrome.runtime?.lastError) {
+    return;
+  }
+
+  void chrome.runtime.lastError.message;
+}
+
+function suppressSendMessageRejection(sendResult: unknown): void {
+  if (!sendResult || (typeof sendResult !== 'object' && typeof sendResult !== 'function')) {
+    return;
+  }
+
+  const maybeCatch = (sendResult as { catch?: unknown }).catch;
+
+  if (typeof maybeCatch !== 'function') {
+    return;
+  }
+
+  try {
+    void maybeCatch.call(sendResult, () => {
+      // No-op: no receiving content script is a valid broadcast outcome.
+    });
+  } catch {
+    // No-op: defensive handling for non-standard thenables.
+  }
+}
+
 export function createHideListSyncBackgroundService(
   input: CreateHideListSyncBackgroundServiceInput
 ): HideListSyncBackgroundService {
@@ -65,13 +93,15 @@ export function createHideListSyncBackgroundService(
 
   const broadcastState = (requestId: string, state: HideListStateSnapshot, trigger: 'mutation' | 'snapshot'): void => {
     try {
-      input.runtime.sendMessage(
+      const sendResult = input.runtime.sendMessage(
         createHideListStateSyncMessage({
           requestId,
           state,
           trigger
-        })
+        }),
+        consumeRuntimeLastError
       );
+      suppressSendMessageRejection(sendResult);
     } catch {
       // No-op: broadcast failures must not crash service worker.
     }

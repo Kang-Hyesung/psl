@@ -39,8 +39,16 @@ describe('manifest scaffold contract', () => {
     expect(manifest.content_scripts).toHaveLength(1);
     expect(manifest.content_scripts?.[0]?.js).toEqual(['content.js']);
     expect(manifest.content_scripts?.[0]?.run_at).toBe('document_idle');
-    expect(hostPermissions).toEqual(['https://www.kyobobook.co.kr/*']);
-    expect(contentScriptMatches).toEqual(['https://www.kyobobook.co.kr/*']);
+    expect(hostPermissions).toEqual([
+      'https://www.kyobobook.co.kr/*',
+      'https://search.kyobobook.co.kr/*',
+      'https://product.kyobobook.co.kr/*'
+    ]);
+    expect(contentScriptMatches).toEqual([
+      'https://www.kyobobook.co.kr/*',
+      'https://search.kyobobook.co.kr/*',
+      'https://product.kyobobook.co.kr/*'
+    ]);
     expect(hostPermissions).not.toContain(wildcardHost);
     expect(contentScriptMatches).not.toContain(wildcardHost);
     expect(manifest.action?.default_popup).toBe('popup.html');

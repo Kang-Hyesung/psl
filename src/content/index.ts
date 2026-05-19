@@ -2,6 +2,7 @@ import { KyoboAdapter } from '../adapters/kyobo-adapter';
 import { readHideListEnabledSetting, HIDE_LIST_ENABLED_STORAGE_KEY } from '../shared/hide-list-enabled-setting';
 import { createHideListSyncClient, type HideListSyncClient } from '../shared/hide-list-sync-client';
 import { createChromeStorageLocalDriver, HIDDEN_KEYS_STORAGE_KEY, LocalStorageRepository } from '../storage';
+import { createDomCardReplenisher } from './card-replenishment';
 import { createMutationObserverEventSource, createWindowEventSource, type ReapplyEventSource, startDynamicReapplyFlow } from './dynamic-reapply';
 import { createDomRuntimeCards, revealHiddenRuntimeCards, RUNTIME_CARD_SELECTOR } from './dom-runtime-cards';
 
@@ -62,6 +63,7 @@ function createRuntimeEventSources(rootDocument: Document, syncClient: HideListS
   const sources: ReapplyEventSource[] = [
     createWindowEventSource(window, 'popstate'),
     createWindowEventSource(window, 'hashchange'),
+    createWindowEventSource(window, 'click'),
     createRuntimeMessageEventSource(syncClient)
   ];
 
@@ -110,6 +112,10 @@ async function runContentScript(): Promise<void> {
         return result !== null;
       }
     },
+    replenisher: createDomCardReplenisher({
+      rootDocument: document,
+      adapter
+    }),
     readUrl: () => (markerWindow.__kyoboHideListForceEnableForTest__ ? 'https://www.kyobobook.co.kr/search?keyword=test' : window.location.href),
     readCards: () => createDomRuntimeCards(document, adapter),
     eventSources: createRuntimeEventSources(document, syncClient)

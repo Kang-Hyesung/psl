@@ -90,7 +90,6 @@ test('content runtime keeps non-kyobo domain as no-op without page errors', asyn
   });
 
   await page.addScriptTag({
-    type: 'module',
     url: '/content.js'
   });
 

@@ -1,5 +1,7 @@
 # Release Checklist (Kyobo Hide List)
 
+For every individual task, use `docs/task-completion-test-checklist.md` before reporting completion. This release checklist is the broader release gate.
+
 ## 1) Pre-release quality gates
 
 Run the full gate chain from project root:
